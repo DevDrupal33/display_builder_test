@@ -77,8 +77,10 @@ RUN set -eux; \
 
 # Install Playwright with dependencies (cache-busted for latest browsers)
 RUN set -eux; \
+    npm install @playwright/test @shoelace-style/shoelace htmx-ext-sse && \
+    mkdir -p /var/www/pw-browsers && \
     date > /tmp/cache-bust && \
-    PLAYWRIGHT_BROWSERS_PATH=/var/lib/pw-browsers npx playwright install --with-deps && \
+    PLAYWRIGHT_BROWSERS_PATH=/var/www/pw-browsers npx playwright install && \
     # Clean up in same layer to reduce size (including Playwright cache!)
     rm -f /tmp/cache-bust && \
     rm -rf /tmp/* \

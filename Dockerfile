@@ -2,7 +2,7 @@
 FROM node:24-slim AS node-stage
 
 # Testing image used for GitLab CI
-FROM php:8.3-apache AS base
+FROM registry.gitlab.com/drupal-infrastructure/drupalci/drupalci-environments/php-8.4-apache:production AS base
 
 # Copy Node.js binaries and modules from the official Node.js image
 COPY --from=node-stage /usr/local/bin/node /usr/local/bin/
@@ -57,27 +57,12 @@ RUN docker-php-ext-install -j$(nproc) \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Configure Apache and PHP in a single layer
-RUN a2enmod rewrite && \
-    echo "memory_limit = -1" > /usr/local/etc/php/conf.d/cli-memory.ini && \
+RUN echo "memory_limit = -1" > /usr/local/etc/php/conf.d/cli-memory.ini && \
     echo "memory_limit = 512M" > /usr/local/etc/php/conf.d/apache-memory.ini
-
-# Install Chrome and ChromeDriver for PHPUnit functional tests
-RUN set -eux; \
-    CHROME_VERSION=$(curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json | jq -r '.channels.Stable.version') && \
-    curl -L "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip" -o chrome-linux64.zip && \
-    unzip chrome-linux64.zip -d /opt/ && \
-    ln -sf /opt/chrome-linux64/chrome /usr/local/bin/google-chrome && \
-    curl -L "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip" -o chromedriver-linux64.zip && \
-    unzip chromedriver-linux64.zip -d /usr/local/bin/ && \
-    mv /usr/local/bin/chromedriver-linux64/chromedriver /usr/local/bin/ && \
-    chmod +x /usr/local/bin/chromedriver && \
-    # Clean up downloads in same layer
-    rm -f chrome-linux64.zip chromedriver-linux64.zip && \
-    rm -rf /usr/local/bin/chromedriver-linux64/
 
 # Install Playwright with dependencies (cache-busted for latest browsers)
 RUN set -eux; \
-    npm install @playwright/test @shoelace-style/shoelace htmx-ext-sse && \
+    npm install @playwright/test @shoelace-style/shoelace && \
     mkdir -p /var/www/pw-browsers && \
     date > /tmp/cache-bust && \
     PLAYWRIGHT_BROWSERS_PATH=/var/www/pw-browsers npx playwright install --with-deps && \

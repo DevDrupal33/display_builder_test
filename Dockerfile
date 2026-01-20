@@ -1,56 +1,7 @@
 # Testing image used for GitLab CI
 FROM drupalci/php-8.4-ubuntu-apache:production
 
-# Install system packages and clean up in a single layer
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libsodium-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libicu-dev \
-    libjpeg62-turbo-dev \
-    libssl-dev \
-    libcurl4-openssl-dev \
-    libzip-dev \
-    libonig-dev \
-    libxml2-dev \
-    curl \
-    jq \
-    unzip \
-    ca-certificates \
-    sudo \
-    git \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-               /tmp/* \
-               /var/tmp/* \
-               /usr/share/doc/* \
-               /usr/share/man/*
-
-# Configure GD with jpeg and freetype support
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-
-# Install PHP extensions required by Drupal
-RUN docker-php-ext-install -j$(nproc) \
-    sodium \
-    pdo \
-    pdo_mysql \
-    mysqli \
-    gd \
-    opcache \
-    zip \
-    mbstring \
-    xml \
-    dom \
-    simplexml
-
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Configure Apache and PHP in a single layer
-RUN echo "memory_limit = -1" > /usr/local/etc/php/conf.d/cli-memory.ini && \
-    echo "memory_limit = 512M" > /usr/local/etc/php/conf.d/apache-memory.ini
-
-# Install Playwright with dependencies (cache-busted for latest browsers)
+# Install Playwright with dependencies
 RUN set -eux; \
     npm install @playwright/test @shoelace-style/shoelace && \
     mkdir -p /var/www/pw-browsers && \

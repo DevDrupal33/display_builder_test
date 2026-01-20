@@ -2,7 +2,7 @@
 FROM node:24-slim AS node-stage
 
 # Testing image used for GitLab CI
-FROM registry.gitlab.com/drupal-infrastructure/drupalci/drupalci-environments/php-8.4-apache:production AS base
+FROM drupalci/php-8.4-ubuntu-apache:production AS base
 
 # Copy Node.js binaries and modules from the official Node.js image
 COPY --from=node-stage /usr/local/bin/node /usr/local/bin/

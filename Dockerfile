@@ -1,15 +1,5 @@
-# Multi-stage build for Node.js
-FROM node:24-slim AS node-stage
-
 # Testing image used for GitLab CI
-FROM drupalci/php-8.4-ubuntu-apache:production AS base
-
-# Copy Node.js binaries and modules from the official Node.js image
-COPY --from=node-stage /usr/local/bin/node /usr/local/bin/
-COPY --from=node-stage /usr/local/lib/node_modules /usr/local/lib/node_modules
-# Create symlinks for npm and npx
-RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
-    ln -sf /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
+FROM drupalci/php-8.4-ubuntu-apache:production
 
 # Install system packages and clean up in a single layer
 RUN apt-get update && apt-get install -y --no-install-recommends \

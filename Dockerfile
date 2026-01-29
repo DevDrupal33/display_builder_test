@@ -1,6 +1,9 @@
 # Testing image used for GitLab CI
 FROM drupalci/php-8.4-ubuntu-apache:production
 
+RUN curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg -o /usr/share/keyrings/yarn-keyring.asc \
+    && echo "deb [signed-by=/usr/share/keyrings/yarn-keyring.asc] https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
 # Install Playwright with dependencies
 RUN set -eux; \
     npm install @playwright/test @shoelace-style/shoelace && \

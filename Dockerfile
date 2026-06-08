@@ -6,6 +6,7 @@ RUN curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg -o /usr/share/keyrings/y
 
 # Install Playwright with dependencies
 RUN set -eux; \
+    npm install -g npm && \
     npm install @playwright/test @shoelace-style/shoelace && \
     mkdir -p /var/www/pw-browsers && \
     date > /tmp/cache-bust && \
